@@ -1,7 +1,7 @@
 FROM debian:stable-slim
 
 # Build arguments
-ARG S6_OVERLAY_VERSION=3.1.6.2
+ARG S6_OVERLAY_VERSION=3.2.0.2
 ARG TARGETARCH
 
 # ENV variables
@@ -11,10 +11,10 @@ ENV CUPSADMIN admin
 ENV CUPSPASSWORD password
 
 
-LABEL org.opencontainers.image.source="https://github.com/anujdatar/cups-docker"
+LABEL org.opencontainers.image.source="https://github.com/manuelm/cups-docker"
 LABEL org.opencontainers.image.description="CUPS Printer Server"
-LABEL org.opencontainers.image.author="Anuj Datar <anuj.datar@gmail.com>"
-LABEL org.opencontainers.image.url="https://github.com/anujdatar/cups-docker/blob/main/README.md"
+LABEL org.opencontainers.image.author="Manuel M"
+LABEL org.opencontainers.image.url="https://github.com/manuelm/cups-docker/blob/main/README.md"
 LABEL org.opencontainers.image.licenses=MIT
 
 # Add script for installing s6-overlay
@@ -22,19 +22,10 @@ COPY ./scripts /tmp/scripts
 
 # Install dependencies
 RUN apt-get update -qq && apt-get upgrade -qqy \
-    && apt-get install -qqy \
-        apt-utils \
-        usbutils \
+    && apt-get install --no-install-recommends --no-install-suggests -qqy \
         cups \
         cups-filters \
-        printer-driver-all \
-        printer-driver-cups-pdf \
-        printer-driver-foo2zjs \
         foomatic-db-compressed-ppds \
-        openprinting-ppds \
-        hpijs-ppds \
-        hp-ppd \
-        hplip \
         avahi-daemon \
     && /tmp/scripts/install-s6-overlay.sh \
     && rm -rf /tmp/scripts \
