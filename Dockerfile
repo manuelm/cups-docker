@@ -19,7 +19,8 @@ LABEL org.opencontainers.image.licenses=MIT
 
 # Install dependencies
 RUN --mount=type=bind,source=services,target=/tmp/s6/services \
-    --mount=type=bind,source=cont-init,target=/tmp/s6/cont-init <<EOF
+    --mount=type=bind,source=cont-init,target=/tmp/s6/cont-init <<EOF bash
+set -ex
 apt-get update -qq
 apt-get upgrade -qqy
 apt-get install --no-install-recommends --no-install-suggests -qqy \
@@ -59,7 +60,7 @@ wget -qO- "https://github.com/just-containers/s6-overlay/releases/download/v${S6
 
 # Add s6 service definitions
 cp -r /tmp/s6/services /etc/services.d
-cp -r /tmp/cont-init /etc/cont-init.d
+cp -r /tmp/s6/cont-init /etc/cont-init.d
 EOF
 
 EXPOSE 631
