@@ -5,10 +5,10 @@ ARG S6_OVERLAY_VERSION=3.2.0.2
 ARG TARGETARCH
 
 # ENV variables
-ENV DEBIAN_FRONTEND noninteractive
-ENV TZ "America/New_York"
-ENV CUPSADMIN admin
-ENV CUPSPASSWORD password
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ="America/New_York"
+ENV CUPSADMIN=admin
+ENV CUPSPASSWORD=password
 
 
 LABEL org.opencontainers.image.source="https://github.com/manuelm/cups-docker"
@@ -18,7 +18,8 @@ LABEL org.opencontainers.image.url="https://github.com/manuelm/cups-docker/blob/
 LABEL org.opencontainers.image.licenses=MIT
 
 # Install dependencies
-RUN <<EOF
+RUN --mount=type=bind,source=services,target=/tmp/s6/services \
+    --mount=type=bind,source=cont-init,target=/tmp/s6/cont-init <<EOF
 apt-get update -qq
 apt-get upgrade -qqy
 apt-get install --no-install-recommends --no-install-suggests -qqy \
@@ -55,16 +56,16 @@ wget -qO- "https://github.com/just-containers/s6-overlay/releases/download/v${S6
 wget -qO- "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_OVERLAY_ARCH}.tar.xz" | tar -C / -Jxpf -
 wget -qO- "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz" | tar -C / -Jxpf -
 wget -qO- "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz" | tar -C / -Jxpf -
+
+# Add s6 service definitions
+cp -r /tmp/s6/services /etc/services.d
+cp -r /tmp/cont-init /etc/cont-init.d
 EOF
 
 EXPOSE 631
 EXPOSE 5353/udp
 
 VOLUME [ "/etc/cups" ]
-
-# Add s6 service definitions
-COPY ./services /etc/services.d
-COPY ./cont-init /etc/cont-init.d
 
 # Command to start s6-init
 CMD ["/init"]
