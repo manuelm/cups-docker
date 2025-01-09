@@ -27,7 +27,7 @@ RUN apt-get update -qq && apt-get upgrade -qqy \
         cups-filters \
         foomatic-db-compressed-ppds \
         avahi-daemon \
-        wget \
+        wget ca-certificates \
     && /tmp/scripts/install-s6-overlay.sh \
     && rm -rf /tmp/scripts \
     && apt-get clean \
